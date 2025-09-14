@@ -1,676 +1,725 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Happy Birthday FRIEND!</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg: linear-gradient(135deg,#FF7EE2 0%, #8F71FF 50%, #55D2FF 100%);
-      --glass: rgba(255,255,255,0.15);
-      --gold:#FFD66E;
-    }
-    body{
-      background: var(--bg);
-      min-height:100vh;
-      overflow-x:hidden;
-      color:#1b0b2a;
-      font-family:'Nunito', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial;
-    }
-    h1,h2,h3,.brand{ font-family:'Baloo 2', cursive }
-    .glass{
-      background: var(--glass);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border:1px solid rgba(255,255,255,0.25);
-      box-shadow: 0 10px 30px rgba(0,0,0,.12);
-    }
-    .btn{ transition: transform .12s ease, opacity .2s ease, box-shadow .2s ease }
-    .btn:active{ transform: translateY(1px) scale(.99) }
-    .page{
-      position:absolute; top:88px; left:0; width:100%;
-      min-height: calc(100vh - 88px); padding-bottom: 28px;
-      transition: transform .6s cubic-bezier(.22,.68,0,1.02), opacity .6s ease;
-    }
-    .shown{ opacity:1; transform: translateX(0); pointer-events:auto }
-    .hidden{ opacity:0; transform: translateX(24px); pointer-events:none }
-    /* Glow title */
-    .glow{ text-shadow: 0 0 14px rgba(255,255,255,.65), 0 0 28px rgba(255,214,110,.55) }
-    /* Balloons rising background */
-    @keyframes rise{ 0%{ transform: translateY(0) } 100%{ transform: translateY(-120vh) } }
-    .floatSlow{ animation: rise 14s linear infinite }
-    .floatMed{ animation: rise 11s linear infinite }
-    .floatFast{ animation: rise 9s linear infinite }
-    /* Confetti */
-    .confetti{
-      position: fixed; width:10px; height:14px; top:-20px; left:50%;
-      opacity:.95; transform: translateX(-50%); border-radius:2px; z-index:60;
-    }
-    /* Cursor sparkles */
-    .sparkle{
-      position: fixed; pointer-events:none; width:8px; height:8px; border-radius:50%;
-      z-index:70; filter: blur(.2px); animation: sparkle .8s forwards ease-out;
-    }
-    @keyframes sparkle{ 0%{ transform: translate(0,0) scale(1); opacity:1 } 100%{ transform: translate(0,-18px) scale(0); opacity:0 } }
-    /* Memory cards */
-    .card{ perspective:800px; cursor:pointer }
-    .cardInner{ position:relative; width:100%; height:100%; transform-style:preserve-3d; transition: transform .5s ease }
-    .card.flipped .cardInner{ transform: rotateY(180deg) }
-    .cardFace{ position:absolute; inset:0; backface-visibility:hidden; border-radius:14px }
-    .cardBack{ transform: rotateY(180deg) }
-    /* Whack-a-Hat */
-    .hole{ position:relative; overflow:hidden }
-    .hat{ position:absolute; left:50%; bottom:-90px; transform: translateX(-50%); width:70px; height:70px; cursor:pointer; transition: bottom .15s ease }
-    .hat.up{ bottom:0 }
-    /* Fireworks canvas */
-    #fwCanvas{ width:100%; height:70vh; display:block; border-radius:20px }
-    /* Toast */
-    .toast{ position:fixed; bottom:18px; left:50%; transform:translateX(-50%); z-index:90 }
-    /* Mascot mouth talking */
-    .talk .mouth{ transform-origin:center; animation: talk .18s infinite alternate ease-in-out }
-    @keyframes talk{ from{ transform: scaleY(.6) } to{ transform: scaleY(1.1) } }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Happy Birthday — Insert Your Name</title>
+<style>
+  /* Mobile-first, playful palette */
+  :root{
+    --bg:#FFF6FF;
+    --card:#ffffff;
+    --accent1:#ff5aa5;
+    --accent2:#6ec6ff;
+    --accent3:#ffd166;
+    --accent4:#a17bff;
+    --text:#222;
+    --glass: rgba(255,255,255,0.7);
+    --shadow: 0 6px 20px rgba(0,0,0,0.12);
+    --safe-margin: 16px;
+    --radius:18px;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;}
+  body{
+    background: linear-gradient(160deg, #fff0f8 0%, #f0f8ff 50%, #fffaf0 100%);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow:hidden;
+  }
+
+  /* App container */
+  .app{
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    gap:12px;
+    padding: calc(var(--safe-margin) + 8px);
+    box-sizing:border-box;
+    position:relative;
+  }
+
+  /* Header area */
+  header{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+  }
+  .logo{
+    display:flex;align-items:center;gap:8px;
+    font-weight:700;
+  }
+  .logo .dot{width:12px;height:12px;border-radius:50%;background:var(--accent1);box-shadow:0 4px 10px rgba(0,0,0,0.12)}
+  .nav-btn{
+    background:var(--card);border-radius:12px;padding:8px 12px;box-shadow:var(--shadow);font-weight:600;border:none;
+  }
+
+  /* Pages (sections) */
+  .page{width:100%;height:calc(100vh - 110px);background:transparent;border-radius:12px;display:none;flex-direction:column;align-items:center;overflow:auto;padding:12px 0;}
+  .page.active{display:flex}
+
+  /* Hero */
+  .hero{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    padding-top:12px;
+  }
+  .greeting{
+    font-size:28px; text-align:center; font-weight:800; letter-spacing:0.6px;
+    padding:18px 12px;border-radius:14px;background:linear-gradient(90deg,var(--accent2),var(--accent4));
+    color:white;box-shadow:0 12px 30px rgba(0,0,0,0.12);width:100%;
+    animation: glow 3000ms infinite alternate;
+  }
+  @keyframes glow{
+    from{filter:drop-shadow(0 6px 18px rgba(161,123,255,0.18))}
+    to{filter:drop-shadow(0 14px 28px rgba(255,90,165,0.18))}
+  }
+
+  .small{
+    font-size:14px;color:#444;margin-top:4px;text-align:center;
+  }
+
+  .big-btn{
+    margin-top:12px;
+    background:linear-gradient(90deg,var(--accent1),var(--accent2));
+    color:white;padding:14px 18px;border-radius:14px;border:none;font-weight:800;font-size:16px;box-shadow:var(--shadow);
+    width:85%;
+  }
+  .secondary{
+    background:linear-gradient(90deg,var(--card),#fff);color:var(--accent2);border:2px solid rgba(0,0,0,0.04)
+  }
+
+  /* floating balloons container */
+  #balloon-layer{position:absolute;left:0;right:0;top:0;height:100vh;pointer-events:none;overflow:hidden;z-index:1}
+
+  /* mascot and audio */
+  .mascot{
+    width:84px;height:84px;border-radius:18px;background:linear-gradient(180deg,#fff 0%,#fff5f0 100%);display:flex;align-items:center;
+    justify-content:center;box-shadow:var(--shadow);font-size:40px;
+  }
+  .controls{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;justify-content:center}
+
+  /* games area */
+  .games{width:100%;display:flex;flex-direction:column;gap:12px;align-items:center}
+  .game-card{width:90%;background:var(--card);border-radius:14px;padding:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;align-items:center}
+  .game-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%}
+  .balloon{width:62px;height:84px;border-radius:60px 60px 20px 20px;display:flex;align-items:center;justify-content:center;font-size:20px;color:white;position:relative;cursor:pointer;box-shadow:0 8px 18px rgba(0,0,0,0.12)}
+  .balloon::after{content:'';width:2px;height:20px;background:#333;position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);border-radius:2px;opacity:0.6}
+
+  /* gift box */
+  .gift{width:64px;height:64px;background:linear-gradient(180deg,#ffefef,#ffd6f0);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:28px;cursor:pointer}
+  .gift .ribbon{position:absolute;width:18px;height:18px;border-radius:6px;background:var(--accent1);transform:rotate(45deg);top:6px}
+
+  /* memory card */
+  .card{width:70px;height:70px;border-radius:12px;background:#f7f7f7;display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+  .card.flipped{background:linear-gradient(90deg,var(--accent2),var(--accent4));color:white}
+
+  /* message input */
+  .message-container{width:90%;display:flex;flex-direction:column;gap:8px}
+  textarea{width:100%;min-height:90px;border-radius:10px;padding:10px;border:none;box-shadow:var(--shadow);resize:none}
+  .messages-list{width:100%;max-height:160px;overflow:auto;padding:8px;border-radius:8px;background:linear-gradient(180deg,#ffffff,#fff);box-shadow:0 6px 12px rgba(0,0,0,0.06)}
+  .msg{padding:8px;border-radius:8px;background:linear-gradient(90deg,#fff,#fff7);margin-bottom:8px;font-size:14px}
+
+  /* final cake */
+  .cake-wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+  .cake{
+    width:220px;height:160px;background:linear-gradient(180deg,#ffcfdf,#ff9fbf);
+    border-radius:16px 16px 40px 40px;position:relative;box-shadow:0 20px 40px rgba(0,0,0,0.12);
+    display:flex;align-items:center;justify-content:center;flex-direction:column;padding-top:28px;
+  }
+  .candles{display:flex;gap:8px;position:absolute;top:-22px}
+  .candle{width:10px;height:32px;background:#fff;border-radius:3px;position:relative;display:flex;align-items:flex-start;justify-content:center;box-shadow:0 6px 12px rgba(0,0,0,0.08)}
+  .flame{width:8px;height:12px;background:orange;border-radius:50%;position:absolute;top:-10px;box-shadow:0 6px 10px rgba(255,165,0,0.3)}
+  .cake-sprinkle{width:8px;height:8px;border-radius:50%;position:absolute;left:12%;top:40%}
+  .blown .flame{opacity:0;transform:translateY(-8px);transition:all 700ms cubic-bezier(.2,.9,.3,1)}
+
+  /* fireworks canvas overlay */
+  canvas#confetti-canvas{position:fixed;left:0;top:0;pointer-events:none;z-index:50}
+
+  footer{position:relative;width:100%;display:flex;justify-content:center;gap:8px;margin-bottom:6px}
+  .small-muted{font-size:12px;color:#555}
+
+  /* responsive tweaks */
+  @media(min-width:420px){
+    .greeting{font-size:32px}
+    .cake{width:320px;height:220px}
+  }
+
+</style>
 </head>
 <body>
-  <!-- Header -->
-  <header class="glass sticky top-0 z-40">
-    <div class="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
-      <button id="logo" class="brand text-2xl sm:text-3xl flex items-center gap-2 text-white/90 hover:text-white transition">
-        <span>🎉</span><span>Birthday Mix</span>
-      </button>
-      <nav class="flex items-center gap-2 sm:gap-3">
-        <button class="nav btn px-3 py-2 rounded-xl bg-white/25 text-white hover:bg-white/35" data-page="home">Home</button>
-        <button class="nav btn px-3 py-2 rounded-xl bg-white/20 text-white hover:bg-white/30" data-page="voice">Voice Wishes</button>
-        <button class="nav btn px-3 py-2 rounded-xl bg-white/20 text-white hover:bg-white/30" data-page="games">Games</button>
-        <button class="nav btn px-3 py-2 rounded-xl bg-white/20 text-white hover:bg-white/30" data-page="final">Final</button>
-      </nav>
-      <div class="flex items-center gap-2">
-        <button id="music" class="btn px-3 py-2 rounded-xl bg-gradient-to-r from-purple-500/80 to-pink-500/80 text-white hover:from-purple-500 hover:to-pink-500">🎵 Music (Demo)</button>
-      </div>
+<div id="balloon-layer"></div>
+<canvas id="confetti-canvas"></canvas>
+
+<div class="app" role="application" aria-label="Birthday app">
+  <header>
+    <div class="logo" aria-hidden="true"><span class="dot"></span><span>Birthday Fun</span></div>
+    <div>
+      <button class="nav-btn" id="home-btn">Home</button>
+      <button class="nav-btn" id="voice-btn">Voice</button>
+      <button class="nav-btn" id="games-btn">Games</button>
+      <button class="nav-btn" id="final-btn">Final</button>
     </div>
   </header>
 
-  <main class="relative">
-    <!-- HOME -->
-    <section id="home" class="page shown">
-      <div class="max-w-6xl mx-auto px-5 pt-8 relative">
-        <!-- Background balloons -->
-        <div class="pointer-events-none absolute inset-0">
-          <div class="absolute bottom-0 left-8 floatSlow opacity-80">
-            <svg width="80" height="120" viewBox="0 0 80 120">
-              <defs><linearGradient id="hb1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FF8EC7"/><stop offset="100%" stop-color="#FF5DA2"/></linearGradient></defs>
-              <ellipse cx="40" cy="40" rx="28" ry="34" fill="url(#hb1)"/><path d="M40,74 L40,110" stroke="#9b6b4a" stroke-width="2"/>
-            </svg>
-          </div>
-          <div class="absolute bottom-0 right-10 floatMed opacity-80">
-            <svg width="90" height="130" viewBox="0 0 90 130">
-              <defs><linearGradient id="hb2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6EE7F9"/><stop offset="100%" stop-color="#4FA9FF"/></linearGradient></defs>
-              <ellipse cx="45" cy="44" rx="30" ry="36" fill="url(#hb2)"/><path d="M45,80 L45,118" stroke="#9b6b4a" stroke-width="2"/>
-            </svg>
-          </div>
-          <div class="absolute bottom-0 left-1/2 -translate-x-1/2 floatFast opacity-80">
-            <svg width="70" height="110" viewBox="0 0 80 120">
-              <defs><linearGradient id="hb3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD66E"/><stop offset="100%" stop-color="#FFB86C"/></linearGradient></defs>
-              <ellipse cx="40" cy="40" rx="26" ry="32" fill="url(#hb3)"/><path d="M40,72 L40,110" stroke="#9b6b4a" stroke-width="2"/>
-            </svg>
-          </div>
-        </div>
+  <!-- Home Page -->
+  <section id="home" class="page active" aria-labelledby="homeTitle">
+    <div class="hero" role="region">
+      <div class="greeting" id="homeTitle">Happy Birthday — Insert your name!</div>
+      <div class="small">Enter the name below — the site will say it and use it across pages.</div>
 
-        <div class="relative text-center z-10">
-          <p class="inline-block mb-3 px-4 py-1 rounded-full bg-white/30 text-white tracking-wide">It’s party time!</p>
-          <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold text-white glow leading-tight">
-            Happy Birthday <span class="bg-clip-text text-transparent bg-gradient-to-r from-yellow-200 via-pink-200 to-blue-200">FRIEND</span>!
-          </h1>
-          <p class="max-w-2xl mx-auto mt-4 text-white/90 text-lg">Balloons, confetti, games, and a big finale 🚀</p>
+      <div style="width:90%;display:flex;gap:8px;justify-content:center;align-items:center;margin-top:8px">
+        <input id="nameInput" type="text" placeholder="Insert your name" style="flex:1;padding:12px;border-radius:12px;border:none;box-shadow:var(--shadow);font-weight:700" />
+        <button class="big-btn secondary" id="saveNameBtn" style="padding:12px 16px">Save</button>
+      </div>
 
-          <div class="mt-8">
-            <button class="goNext btn px-6 py-4 rounded-2xl text-white text-xl font-extrabold bg-gradient-to-r from-blue-400 to-purple-500 hover:opacity-90">
-              Click for a Surprise 🎁
-            </button>
-            <p class="text-white/80 text-sm mt-2">You’ll jump to Voice Wishes</p>
-          </div>
+      <button class="big-btn" id="surpriseBtn" style="width:90%">Click for a Surprise 🎉</button>
 
-          <!-- Countdown -->
-          <div class="mt-8 grid grid-cols-4 gap-3 max-w-xl mx-auto">
-            <div class="glass rounded-2xl p-4 text-center">
-              <div id="cd-d" class="text-3xl font-extrabold text-white">0</div><div class="text-white/85">Days</div>
-            </div>
-            <div class="glass rounded-2xl p-4 text-center">
-              <div id="cd-h" class="text-3xl font-extrabold text-white">0</div><div class="text-white/85">Hours</div>
-            </div>
-            <div class="glass rounded-2xl p-4 text-center">
-              <div id="cd-m" class="text-3xl font-extrabold text-white">0</div><div class="text-white/85">Minutes</div>
-            </div>
-            <div class="glass rounded-2xl p-4 text-center">
-              <div id="cd-s" class="text-3xl font-extrabold text-white">0</div><div class="text-white/85">Seconds</div>
-            </div>
-          </div>
-          <p class="text-white/75 text-xs mt-2">Counting down to midnight 🎂</p>
+      <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+        <div class="mascot" id="homeMascot">🎂</div>
+        <div style="text-align:left">
+          <div style="font-weight:700">Party Mode</div>
+          <div style="font-size:13px;color:#444">Music, confetti & floating balloons — tap anywhere to pop a confetti burst.</div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- VOICE WISHES (Demo) -->
-    <section id="voice" class="page hidden">
-      <div class="max-w-6xl mx-auto px-5 pt-8">
-        <div class="flex flex-col lg:flex-row gap-6">
-          <div class="flex-1 glass rounded-3xl p-6">
-            <h2 class="text-3xl md:text-4xl font-extrabold text-white">Voice Wishes (Demo)</h2>
-            <p class="text-white/85 mt-1">Play a cheerful message for <span class="font-extrabold">FRIEND</span> — audio will be simulated visually here.</p>
-
-            <div class="mt-5 flex items-center gap-3 flex-wrap">
-              <button id="playDemo" class="btn px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-500 text-white font-semibold hover:opacity-90">▶️ Play “Happy Birthday”</button>
-              <button id="pauseDemo" class="btn px-4 py-3 rounded-xl bg-white/85 text-purple-700 font-semibold hover:bg-white">⏸️ Pause</button>
-              <button id="ttsDemo" class="btn px-4 py-3 rounded-xl bg-gradient-to-r from-yellow-300 to-pink-300 text-purple-800 font-extrabold hover:opacity-90">🗣️ Read Wish (Demo)</button>
-            </div>
-
-            <div class="mt-5">
-              <label class="block text-white/90 mb-2">Upload a custom voice file (MP3/WAV) – Demo</label>
-              <input id="voiceUpload" type="file" accept=".mp3,.wav,audio/*" class="w-full rounded-xl px-4 py-3 bg-white/85" />
-              <p class="text-white/75 text-sm mt-2">Files will list below for reference. Playback is simulated.</p>
-              <ul id="voiceList" class="mt-3 space-y-2 text-white/95"></ul>
-            </div>
-
-            <div class="mt-6 text-white/85 text-sm">Note: Audio features are shown as a visual demo here.</div>
-          </div>
-
-          <!-- Talking Mascot -->
-          <div class="w-full lg:w-[420px] glass rounded-3xl p-6 flex flex-col items-center justify-center">
-            <div id="mascot" class="transition-all">
-              <svg viewBox="0 0 200 200" class="w-56 h-56">
-                <defs><linearGradient id="mg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FF8EC7"/><stop offset="100%" stop-color="#8F71FF"/></linearGradient></defs>
-                <rect x="30" y="80" width="140" height="70" rx="18" fill="url(#mg)"/>
-                <rect x="42" y="62" width="116" height="30" rx="12" fill="#FFD6E8"/>
-                <circle cx="80" cy="115" r="8" fill="#1b0b2a"/>
-                <circle cx="120" cy="115" r="8" fill="#1b0b2a"/>
-                <ellipse class="mouth" cx="100" cy="135" rx="12" ry="6" fill="#1b0b2a"/>
-                <rect x="96" y="40" width="8" height="24" rx="3" fill="#55D2FF"/>
-                <path id="flame" d="M100,34 C106,28 106,22 100,18 C94,22 94,28 100,34 Z" fill="#FFD66E"/>
-              </svg>
-            </div>
-            <p id="mascotLine" class="text-center text-white/90 mt-3">Tap play to see me “talk” 🎂</p>
-          </div>
-        </div>
-
-        <div class="mt-6 flex items-center gap-3">
-          <button class="nav btn px-4 py-3 rounded-xl bg-white/85 text-purple-700 font-semibold hover:bg-white" data-page="games">Go to Games</button>
-          <button id="burst2" class="btn px-4 py-3 rounded-xl bg-gradient-to-r from-fuchsia-500 to-rose-500 text-white hover:opacity-90">Confetti Burst</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- GAMES -->
-    <section id="games" class="page hidden">
-      <div class="max-w-6xl mx-auto px-5 pt-8">
-        <div class="flex items-end justify-between flex-wrap gap-4">
+  <!-- Voice Wishes Page -->
+  <section id="voice" class="page" aria-labelledby="voiceTitle">
+    <div class="hero" style="padding-top:6px">
+      <div style="display:flex;gap:10px;align-items:center;width:90%;justify-content:space-between">
+        <div style="display:flex;gap:10px;align-items:center">
+          <div class="mascot" id="voiceMascot">🗣️</div>
           <div>
-            <h2 class="text-3xl md:text-4xl font-extrabold text-white">Fun Games</h2>
-            <p class="text-white/85">Balloon Pop, Gift Surprise, and Memory Match</p>
-          </div>
-          <div class="glass rounded-2xl px-5 py-3 text-white">
-            <div class="text-sm uppercase tracking-wide opacity-80">Total Score</div>
-            <div id="scoreAll" class="text-3xl font-extrabold">0</div>
+            <div id="voiceTitle" style="font-weight:800;font-size:18px">Voice Wishes</div>
+            <div style="font-size:13px;color:#555">Default cheerful wish or upload your own (MP3/WAV).</div>
           </div>
         </div>
-
-        <div class="grid lg:grid-cols-3 gap-5 mt-6">
-          <!-- Balloon Pop -->
-          <div class="glass rounded-2xl p-4">
-            <div class="flex items-center justify-between">
-              <h3 class="text-xl font-extrabold text-white">🎈 Balloon Pop</h3>
-              <button id="balloonReset" class="btn px-3 py-2 rounded-lg bg-white/85 text-purple-700 font-semibold hover:bg-white">Reset</button>
-            </div>
-            <div id="balloonArea" class="relative mt-3 grid grid-cols-3 gap-3"></div>
-            <div class="mt-3 text-white/90">Pops: <span id="balloonScore" class="font-bold">0</span></div>
-          </div>
-
-          <!-- Gift Surprise -->
-          <div class="glass rounded-2xl p-4">
-            <div class="flex items-center justify-between">
-              <h3 class="text-xl font-extrabold text-white">🎁 Gift Box Surprise</h3>
-              <button id="giftReset" class="btn px-3 py-2 rounded-lg bg-white/85 text-purple-700 font-semibold hover:bg-white">Reset</button>
-            </div>
-            <div id="giftRow" class="mt-3 grid grid-cols-2 gap-3"></div>
-          </div>
-
-          <!-- Memory Match -->
-          <div class="glass rounded-2xl p-4">
-            <div class="flex items-center justify-between">
-              <h3 class="text-xl font-extrabold text-white">🧠 Memory Match</h3>
-              <button id="memoryReset" class="btn px-3 py-2 rounded-lg bg-white/85 text-purple-700 font-semibold hover:bg-white">New Game</button>
-            </div>
-            <div id="memoryGrid" class="mt-3 grid grid-cols-4 gap-3"></div>
-            <div class="mt-3 text-white/90">Matches: <span id="matches" class="font-bold">0</span>/8</div>
-          </div>
-        </div>
-
-        <div class="mt-6">
-          <button class="nav btn px-4 py-3 rounded-xl bg-white/85 text-purple-700 font-semibold hover:bg-white" data-page="final">Go to Final</button>
-        </div>
+        <div id="wave" style="font-size:12px;color:#666">Status: idle</div>
       </div>
-    </section>
 
-    <!-- FINAL -->
-    <section id="final" class="page hidden">
-      <div class="max-w-6xl mx-auto px-5 pt-8">
-        <div class="text-center">
-          <h2 class="text-4xl md:text-5xl font-extrabold text-white">Happy Birthday <span class="bg-clip-text text-transparent bg-gradient-to-r from-yellow-200 via-pink-200 to-blue-200">FRIEND</span>!</h2>
-          <p class="text-white/90 mt-2">Tap anywhere to launch fireworks. Hold to blow the candles.</p>
-        </div>
-
-        <div id="fireArea" class="glass rounded-3xl mt-6 p-4 relative overflow-hidden" style="background: radial-gradient(1200px 600px at 50% -10%, rgba(255,255,255,.1), transparent 50%), linear-gradient(180deg,#0f1436 0%, #1b0b2a 100%);">
-          <canvas id="fwCanvas"></canvas>
-          <div class="absolute bottom-4 left-4 flex gap-2 z-10">
-            <button id="fwRandom" class="btn px-4 py-3 rounded-xl bg-gradient-to-r from-fuchsia-500 to-rose-500 text-white hover:opacity-90">Launch Random 🎆</button>
-            <button id="songDemo" class="btn px-4 py-3 rounded-xl bg-gradient-to-r from-amber-300 to-pink-300 text-purple-800 font-extrabold hover:opacity-90">🎵 Play Final Song (Demo)</button>
-          </div>
-          <!-- invisible overlay to capture taps anywhere -->
-          <div id="tapOverlay" class="absolute inset-0 cursor-crosshair" aria-hidden="true"></div>
-        </div>
-
-        <!-- Cake -->
-        <div class="mt-8 max-w-3xl mx-auto glass rounded-3xl p-6">
-          <div class="flex flex-col md:flex-row items-center gap-8">
-            <div class="flex-1">
-              <svg id="cake" viewBox="0 0 400 260" class="w-full h-auto">
-                <ellipse cx="200" cy="230" rx="140" ry="20" fill="#ffffff66"/>
-                <rect x="80" y="130" width="240" height="70" rx="16" fill="#FFB3D1"/>
-                <rect x="95" y="110" width="210" height="50" rx="14" fill="#FFD3E6"/>
-                <path d="M95,130 h210 v20 c-10,18 -30,10 -38,0 c-12,16 -28,8 -34,-2 c-10,18 -30,12 -38,-2 c-12,16 -30,10 -40,0 c-16,18 -34,8 -60,0 z" fill="#FF8EC7"/>
-                <g id="candles">
-                  <g transform="translate(150,90)">
-                    <rect width="14" height="40" x="-7" y="0" rx="4" fill="#6EE7F9"/><circle cx="0" cy="0" r="2" fill="#fff"/>
-                    <g class="flame"><path d="M0,-16 C6,-8 6,-2 0,2 C-6,-2 -6,-8 0,-16 Z" fill="#FFD66E"/><circle cx="0" cy="-8" r="3" fill="#FF8C42"/></g>
-                  </g>
-                  <g transform="translate(200,86)">
-                    <rect width="14" height="44" x="-7" y="0" rx="4" fill="#A78BFA"/><circle cx="0" cy="0" r="2" fill="#fff"/>
-                    <g class="flame"><path d="M0,-16 C6,-8 6,-2 0,2 C-6,-2 -6,-8 0,-16 Z" fill="#FFD66E"/><circle cx="0" cy="-8" r="3" fill="#FF8C42"/></g>
-                  </g>
-                  <g transform="translate(250,92)">
-                    <rect width="14" height="38" x="-7" y="0" rx="4" fill="#FDE68A"/><circle cx="0" cy="0" r="2" fill="#fff"/>
-                    <g class="flame"><path d="M0,-16 C6,-8 6,-2 0,2 C-6,-2 -6,-8 0,-16 Z" fill="#FFD66E"/><circle cx="0" cy="-8" r="3" fill="#FF8C42"/></g>
-                  </g>
-                </g>
-                <g id="smoke" opacity="0">
-                  <circle cx="150" cy="70" r="4" fill="#ffffffaa"><animate attributeName="cy" dur="1.8s" repeatCount="indefinite" values="70;30"/><animate attributeName="opacity" dur="1.8s" repeatCount="indefinite" values=".9;0"/></circle>
-                  <circle cx="200" cy="66" r="5" fill="#ffffffaa"><animate attributeName="cy" dur="2s" repeatCount="indefinite" values="66;26"/><animate attributeName="opacity" dur="2s" repeatCount="indefinite" values=".9;0"/></circle>
-                  <circle cx="250" cy="72" r="4" fill="#ffffffaa"><animate attributeName="cy" dur="1.9s" repeatCount="indefinite" values="72;34"/><animate attributeName="opacity" dur="1.9s" repeatCount="indefinite" values=".9;0"/></circle>
-                </g>
-              </svg>
-            </div>
-            <div class="flex-1">
-              <h3 class="text-white text-2xl font-extrabold mb-2">Make a wish!</h3>
-              <p class="text-white/90">Hold the button to blow out the candles. They’ll flicker then puff out.</p>
-              <div class="mt-4 flex items-center gap-3">
-                <button id="blow" class="btn px-5 py-3 rounded-xl bg-gradient-to-r from-amber-300 to-pink-300 text-purple-800 font-extrabold hover:opacity-90">Hold to Blow</button>
-                <button id="relight" class="btn px-4 py-3 rounded-xl bg-white/85 text-purple-700 font-semibold hover:bg-white">Relight</button>
-              </div>
-              <p class="text-xs text-white/75 mt-2">Tip: click the cake to blow them out too.</p>
-            </div>
-          </div>
-        </div>
+      <div class="controls">
+        <button class="big-btn" id="playDefault">Play Default Wish</button>
+        <button class="big-btn secondary" id="recordBtn">Use Mic Blow (Final page only)</button>
       </div>
-    </section>
-  </main>
 
-  <!-- Toast -->
-  <div id="toast" class="toast hidden">
-    <div class="glass px-4 py-3 rounded-xl text-white text-sm flex items-center gap-2"><span>🔔</span><span id="toastMsg">Hello!</span></div>
-  </div>
+      <div style="width:90%;display:flex;gap:8px;margin-top:12px;align-items:center;flex-direction:column">
+        <input type="file" id="uploadAudio" accept="audio/*" style="width:100%"/>
+        <audio id="uploadedAudio" controls style="width:100%;display:none"></audio>
+        <div style="font-size:13px;color:#444;text-align:center;margin-top:6px">Upload an MP3/WAV from phone—then press play to hear it with our mascot animation.</div>
+      </div>
+    </div>
+  </section>
 
-  <script>
-    // Simple toast
-    const toast = document.getElementById('toast');
-    const toastMsg = document.getElementById('toastMsg');
-    function showToast(msg, ms=2000){ toastMsg.textContent=msg; toast.classList.remove('hidden'); setTimeout(()=>toast.classList.add('hidden'), ms); }
+  <!-- Games Page -->
+  <section id="games" class="page" aria-labelledby="gamesTitle">
+    <div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:6px">
+      <div style="width:90%;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-weight:800">Fun Games</div>
+        <div style="font-size:12px;color:#666">Tap fast — mobile-friendly!</div>
+      </div>
 
-    // Pages
-    const state = { page:'home', score:0, audioOn:false, talking:false };
-    const pages = {
-      home: document.getElementById('home'),
-      voice: document.getElementById('voice'),
-      games: document.getElementById('games'),
-      final: document.getElementById('final'),
-    };
-    const navs = Array.from(document.querySelectorAll('.nav'));
-    function showPage(id){
-      if(!pages[id] || id===state.page) return;
-      pages[state.page].classList.replace('shown','hidden');
-      pages[id].classList.replace('hidden','shown');
-      state.page=id;
-      navs.forEach(b=>{
-        const act = b.getAttribute('data-page')===id;
-        b.classList.toggle('bg-white/35', act);
-        b.classList.toggle('bg-white/20', !act);
-      });
-    }
-    navs.forEach(b=> b.addEventListener('click', ()=> showPage(b.getAttribute('data-page'))));
-    document.querySelectorAll('.goNext').forEach(b=> b.addEventListener('click', ()=> showPage('voice')));
+      <!-- Balloon Pop Game -->
+      <div class="game-card">
+        <div style="font-weight:700">🎈 Balloon Pop</div>
+        <div id="balloonGame" style="width:100%;height:180px;position:relative;overflow:hidden;border-radius:12px"></div>
+        <div style="font-size:13px;color:#444">Pop balloons to reveal little wishes.</div>
+      </div>
 
-    // Cursor sparkles
-    const sparkleColors = ['#fff','#FFD66E','#FF8EC7','#8F71FF','#55D2FF'];
-    window.addEventListener('mousemove', (e)=>{
-      const sp = document.createElement('span');
-      sp.className='sparkle';
-      sp.style.left = (e.clientX + (Math.random()*16-8))+'px';
-      sp.style.top  = (e.clientY + (Math.random()*16-8))+'px';
-      sp.style.background = sparkleColors[Math.floor(Math.random()*sparkleColors.length)];
-      sp.style.boxShadow='0 0 10px rgba(255,255,255,0.6)';
-      document.body.appendChild(sp);
-      setTimeout(()=> sp.remove(), 900);
-    });
-    document.getElementById('logo').addEventListener('click', ()=> confettiBurst());
-
-    // Confetti burst
-    function confettiBurst(x=null, y=null, count=40){
-      const w = window.innerWidth;
-      const x0 = x ?? (w/2);
-      const y0 = y ?? 80;
-      const colors = ['#FF8EC7','#FFD66E','#8F71FF','#55D2FF','#FFB86C','#2af598'];
-      for(let i=0;i<count;i++){
-        const c = document.createElement('div');
-        c.className='confetti';
-        c.style.left = (x0 + (Math.random()*200-100))+'px';
-        c.style.top  = (y0 + (Math.random()*40-20))+'px';
-        c.style.background = colors[Math.floor(Math.random()*colors.length)];
-        c.style.borderRadius = Math.random()>.5 ? '2px' : '50% 50% 12% 50%';
-        document.body.appendChild(c);
-        const dx = (Math.random()*2-1)*2, dy=(Math.random()*1+2), rot=Math.random()*360;
-        const fall= 1200+Math.random()*700, start=performance.now();
-        const anim = (t)=>{
-          const p=Math.min(1,(t-start)/fall);
-          c.style.transform = `translate(${dx*100*p}px, ${dy*180*p}px) rotate(${rot*p}deg)`;
-          c.style.opacity = (1-p).toString();
-          if(p<1) requestAnimationFrame(anim); else c.remove();
-        };
-        requestAnimationFrame(anim);
-      }
-    }
-
-    // Music (Demo)
-    const musicBtn = document.getElementById('music');
-    musicBtn.addEventListener('click', ()=>{
-      state.audioOn = !state.audioOn;
-      musicBtn.textContent = state.audioOn ? '🔊 Music (Demo On)' : '🎵 Music (Demo)';
-      showToast('Audio is demo-only here.');
-    });
-
-    // Countdown to midnight
-    const cdEls = { d:document.getElementById('cd-d'), h:document.getElementById('cd-h'), m:document.getElementById('cd-m'), s:document.getElementById('cd-s') };
-    function nextMidnight(){ const d=new Date(); d.setHours(24,0,0,0); return d; }
-    function tick(){
-      const t=nextMidnight()-new Date(); const sec=Math.max(0,Math.floor(t/1000)%60), min=Math.max(0,Math.floor(t/60000)%60), h=Math.max(0,Math.floor(t/3600000)%24), d=Math.max(0,Math.floor(t/86400000));
-      cdEls.d.textContent=d; cdEls.h.textContent=h; cdEls.m.textContent=min; cdEls.s.textContent=sec;
-    }
-    setInterval(tick,1000); tick();
-
-    // VOICE PAGE (Demo)
-    const playDemo = document.getElementById('playDemo');
-    const pauseDemo = document.getElementById('pauseDemo');
-    const ttsDemo = document.getElementById('ttsDemo');
-    const voiceUpload = document.getElementById('voiceUpload');
-    const voiceList = document.getElementById('voiceList');
-    const mascot = document.getElementById('mascot');
-    const mascotLine = document.getElementById('mascotLine');
-
-    function startTalking(text){
-      mascot.classList.add('talk');
-      mascotLine.textContent = text || `“Happy Birthday, FRIEND!”`;
-      state.talking = true;
-    }
-    function stopTalking(){
-      mascot.classList.remove('talk');
-      mascotLine.textContent = 'Tap play to see me “talk” 🎂';
-      state.talking = false;
-    }
-    playDemo.addEventListener('click', ()=>{
-      startTalking(`Singing “Happy Birthday FRIEND!” 🎵 (Demo)`);
-      showToast('Playing (Demo)');
-    });
-    pauseDemo.addEventListener('click', ()=>{ stopTalking(); showToast('Paused (Demo)'); });
-    ttsDemo.addEventListener('click', ()=>{
-      const sample = `Wishing you the happiest day, FRIEND! ✨ (Demo voice)`;
-      startTalking(sample);
-      setTimeout(stopTalking, 2500);
-      confettiBurst();
-    });
-    voiceUpload.addEventListener('change', ()=>{
-      voiceList.innerHTML='';
-      const files = Array.from(voiceUpload.files||[]);
-      files.forEach(f=>{
-        const li=document.createElement('li');
-        li.className='glass rounded-xl px-3 py-2 flex items-center justify-between';
-        li.innerHTML = `<span>🎧 ${f.name}</span><button class="btn px-3 py-1 rounded-lg bg-white/85 text-purple-700 hover:bg-white">Play (Demo)</button>`;
-        li.querySelector('button').addEventListener('click', ()=>{ startTalking(`Playing ${f.name} (Demo)`); setTimeout(stopTalking, 2000); });
-        voiceList.appendChild(li);
-      });
-      if(!files.length) showToast('No file selected');
-    });
-    document.getElementById('burst2').addEventListener('click', ()=> confettiBurst());
-
-    // GAMES
-    const scoreAll = document.getElementById('scoreAll');
-    function addScore(n){ state.score += n; scoreAll.textContent = state.score; confettiBurst(window.innerWidth-80, 90, 14); }
-
-    // Balloon Pop (click/touch friendly)
-    const wishes = ["May your day sparkle ✨","Make a great wish 🎂","More laughs, more joy 😄","Dream big today 🌈","You shine so bright 🌟","Hugs and cake! 🍰","Adventure awaits 🗺️","Smiles galore 😁","Love & light 💖"];
-    const balloonArea = document.getElementById('balloonArea');
-    const balloonScoreEl = document.getElementById('balloonScore');
-    document.getElementById('balloonReset').addEventListener('click', initBalloons);
-    let balloonScore=0;
-    function makeBalloon(i){
-      const wrap = document.createElement('div');
-      wrap.className='relative aspect-[3/4] glass rounded-2xl flex items-center justify-center';
-      wrap.style.background='linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,.08))';
-      const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-      svg.setAttribute('viewBox','0 0 80 120'); svg.setAttribute('class','w-20 h-28');
-      const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
-      const lg = document.createElementNS('http://www.w3.org/2000/svg','linearGradient');
-      const gid='bb'+i; lg.setAttribute('id',gid); lg.setAttribute('x1','0'); lg.setAttribute('y1','0'); lg.setAttribute('x2','1'); lg.setAttribute('y2','1');
-      const c1 = ['#FF8EC7','#6EE7F9','#FFD66E','#A78BFA','#55D2FF'][Math.floor(Math.random()*5)];
-      const c2 = ['#FF5DA2','#4FA9FF','#FFB86C','#7C5DFA','#3CA4FF'][Math.floor(Math.random()*5)];
-      const s1=document.createElementNS('http://www.w3.org/2000/svg','stop'); s1.setAttribute('offset','0%'); s1.setAttribute('stop-color',c1);
-      const s2=document.createElementNS('http://www.w3.org/2000/svg','stop'); s2.setAttribute('offset','100%'); s2.setAttribute('stop-color',c2);
-      lg.appendChild(s1); lg.appendChild(s2); defs.appendChild(lg); svg.appendChild(defs);
-      const e=document.createElementNS('http://www.w3.org/2000/svg','ellipse'); e.setAttribute('cx','40'); e.setAttribute('cy','40'); e.setAttribute('rx','28'); e.setAttribute('ry','34'); e.setAttribute('fill',`url(#${gid})`);
-      const st=document.createElementNS('http://www.w3.org/2000/svg','path'); st.setAttribute('d','M40,74 L40,110'); st.setAttribute('stroke','#9b6b4a'); st.setAttribute('stroke-width','2');
-      const k=document.createElementNS('http://www.w3.org/2000/svg','path'); k.setAttribute('d','M40,72 C42,70 44,66 40,60 C36,66 38,70 40,72 Z'); k.setAttribute('fill',c2);
-      svg.appendChild(e); svg.appendChild(st); svg.appendChild(k);
-      wrap.appendChild(svg);
-      const hidden = document.createElement('div'); hidden.className='absolute inset-0 flex items-center justify-center text-center text-white font-bold opacity-0 transition-opacity px-2'; hidden.textContent=wishes[i%wishes.length]; wrap.appendChild(hidden);
-
-      const pop = ()=>{
-        if(svg.dataset.popped==='1') return;
-        svg.dataset.popped='1';
-        svg.style.transition='transform .2s ease, opacity .3s ease';
-        svg.style.transform='scale(1.2)'; svg.style.opacity='0';
-        hidden.style.opacity='1';
-        addScore(1); balloonScore++; balloonScoreEl.textContent=balloonScore;
-      };
-      svg.addEventListener('pointerdown', pop, {passive:true});
-      return wrap;
-    }
-    function initBalloons(){
-      balloonArea.innerHTML=''; balloonScore=0; balloonScoreEl.textContent='0';
-      for(let i=0;i<9;i++) balloonArea.appendChild(makeBalloon(i));
-    }
-
-    // Gift Surprise
-    const giftRow = document.getElementById('giftRow');
-    document.getElementById('giftReset').addEventListener('click', initGifts);
-    const surprisesData = [
-      { t:'A wish for joy', emoji:'🌈', msg:'May your year glow with color!' },
-      { t:'Cake incoming', emoji:'🍰', msg:'Infinite slices, zero calories.' },
-      { t:'Dance party', emoji:'🪩', msg:'Spins, sparkles, and grooves.' },
-      { t:'Fireworks pass', emoji:'🎆', msg:'Launch as many as you want!' },
-    ];
-    function giftSVG(){
-      return `
-        <svg viewBox="0 0 120 120" class="w-full h-full">
-          <defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FF8EC7"/><stop offset="100%" stop-color="#8F71FF"/></linearGradient></defs>
-          <rect x="15" y="40" width="90" height="60" rx="12" fill="url(#gg)"/>
-          <rect x="50" y="40" width="20" height="60" fill="#FFD66E"/>
-          <rect x="15" y="30" width="90" height="20" rx="10" fill="url(#gg)"/>
-          <rect x="50" y="25" width="20" height="25" rx="8" fill="#FFD66E"/>
-          <path d="M60,25 C80,5 95,35 80,35 C70,35 66,30 60,25 Z" fill="#FFB3D1"/>
-          <path d="M60,25 C40,5 25,35 40,35 C50,35 54,30 60,25 Z" fill="#FFB3D1"/>
-        </svg>
-      `;
-    }
-    function makeGift(i){
-      const card=document.createElement('button');
-      card.className='group relative glass rounded-2xl p-4 overflow-hidden text-left hover:bg-white/20 transition';
-      card.style.background='linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,.08))';
-      card.innerHTML = `
-        <div class="aspect-square">${giftSVG()}</div>
-        <div class="mt-3 text-white font-extrabold">${surprisesData[i].t}</div>
-        <div class="text-white/80">Click to open</div>
-        <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition">
-          <div class="bg-white/90 rounded-xl px-4 py-3 text-center text-purple-700">
-            <div class="text-3xl">${surprisesData[i].emoji}</div>
-            <div class="text-sm font-semibold">${surprisesData[i].msg}</div>
-          </div>
+      <!-- Gift Boxes -->
+      <div class="game-card">
+        <div style="font-weight:700">🎁 Gift Box Surprise</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;width:100%">
+          <div class="gift" data-idx="0">🎁</div>
+          <div class="gift" data-idx="1">🎁</div>
+          <div class="gift" data-idx="2">🎁</div>
         </div>
-      `;
-      card.addEventListener('click', ()=>{
-        const r = card.getBoundingClientRect();
-        confettiBurst(r.left + r.width/2, r.top + 10, 24);
-        const overlay = card.querySelector('.absolute'); overlay.style.opacity = overlay.style.opacity==='1' ? '0' : '1';
-        addScore(1);
-      });
-      return card;
-    }
-    function initGifts(){
-      giftRow.innerHTML=''; for(let i=0;i<4;i++) giftRow.appendChild(makeGift(i));
-    }
+        <div id="giftReveal" style="margin-top:8px;font-size:14px;color:#333"></div>
+      </div>
 
-    // Memory Match
-    const memoryGrid = document.getElementById('memoryGrid');
-    const memoryReset = document.getElementById('memoryReset');
-    const matchesEl = document.getElementById('matches');
-    const icons = ['🎂','🎈','🎁','🎉','🎊','🎆','🍰','🪩'];
-    let deck=[], first=null, lock=false, matches=0;
-    function buildDeck(){ deck=[...icons,...icons].map((v,i)=>({id:i+'_'+Math.random().toString(36).slice(2), v})).sort(()=>Math.random()-.5); }
-    function renderDeck(){
-      memoryGrid.innerHTML='';
-      deck.forEach(card=>{
-        const cell=document.createElement('div'); cell.className='card aspect-square'; cell.dataset.id=card.id;
-        cell.innerHTML=`
-          <div class="cardInner">
-            <div class="cardFace glass flex items-center justify-center text-white text-3xl" style="background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,.08)); border:1px solid rgba(255,255,255,.25)">❔</div>
-            <div class="cardFace cardBack glass flex items-center justify-center text-3xl" style="background: linear-gradient(180deg, rgba(255,255,255,.3), rgba(255,255,255,.12)); border:1px solid rgba(255,255,255,.25)"><span>${card.v}</span></div>
+      <!-- Memory Match -->
+      <div class="game-card">
+        <div style="font-weight:700">🧠 Memory Match</div>
+        <div id="memoryGrid" class="game-grid" style="margin-top:8px"></div>
+        <div style="font-size:13px;color:#444;margin-top:6px">Match pairs of birthday icons!</div>
+      </div>
+
+      <!-- Messages -->
+      <div class="game-card message-container">
+        <div style="font-weight:700">💌 Leave a message</div>
+        <textarea id="msgInput" placeholder="Write a wish..."></textarea>
+        <div style="display:flex;gap:8px;justify-content:space-between">
+          <button class="big-btn" id="saveMsg">Save Message</button>
+          <button class="nav-btn" id="clearMsgs">Clear</button>
+        </div>
+        <div class="messages-list" id="messagesList" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final Surprise Page -->
+  <section id="final" class="page" aria-labelledby="finalTitle">
+    <div class="hero" style="padding-top:8px">
+      <div style="width:90%;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-weight:800;font-size:18px" id="finalTitle">Final Surprise</div>
+        <div style="font-size:12px;color:#666">Blow out the candles!</div>
+      </div>
+
+      <div class="cake-wrap" style="margin-top:12px">
+        <div id="cake" class="cake" role="img" aria-label="Birthday Cake">
+          <div class="candles" id="candles">
+            <div class="candle"><div class="flame"></div></div>
+            <div class="candle"><div class="flame"></div></div>
+            <div class="candle"><div class="flame"></div></div>
+            <div class="candle"><div class="flame"></div></div>
           </div>
-        `;
-        cell.addEventListener('click', ()=> flip(cell, card));
-        memoryGrid.appendChild(cell);
-      });
-    }
-    function flip(el, card){
-      if(lock || el.classList.contains('flipped')) return;
-      el.classList.add('flipped');
-      if(!first){ first={el,card}; return; }
-      lock=true;
-      const second={el,card};
-      if(first.card.v===second.card.v){
-        matches++; matchesEl.textContent=matches; addScore(2);
-        setTimeout(()=>{ first.el.style.opacity='.6'; second.el.style.opacity='.6'; lock=false; first=null; }, 420);
-      } else {
-        setTimeout(()=>{ first.el.classList.remove('flipped'); second.el.classList.remove('flipped'); lock=false; first=null; }, 600);
-      }
-    }
-    function resetMemory(){ matches=0; matchesEl.textContent='0'; first=null; lock=false; buildDeck(); renderDeck(); }
-    memoryReset.addEventListener('click', resetMemory);
+          <div style="font-weight:800;color:white;font-size:18px">Happy Birthday!</div>
+        </div>
 
-    // Init games
-    initBalloons(); initGifts(); resetMemory();
+        <div style="width:90%;display:flex;gap:8px;justify-content:center;align-items:center">
+          <button class="big-btn" id="blowBtn">Click to Blow Out 🕯️</button>
+          <button class="big-btn secondary" id="micBlowBtn">Blow into Mic</button>
+        </div>
 
-    // FINAL: Fireworks
-    const canvas = document.getElementById('fwCanvas');
-    const ctx = canvas.getContext('2d');
-    function resizeCanvas(){
-      const r=canvas.getBoundingClientRect(); const dpr=window.devicePixelRatio||1;
-      canvas.width=Math.floor(r.width*dpr); canvas.height=Math.floor(r.height*dpr);
-    }
-    window.addEventListener('resize', resizeCanvas); resizeCanvas();
-    const parts=[];
-    function randColor(){ const a=['#FF8EC7','#FFD66E','#8F71FF','#55D2FF','#FFB86C','#2af598']; return a[Math.floor(Math.random()*a.length)]; }
-    function launch(x,y,color){
-      const n=64;
-      for(let i=0;i<n;i++){
-        const ang=Math.random()*Math.PI*2, sp=1+Math.random()*3;
-        parts.push({x,y,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,life:60+Math.random()*30,color});
-      }
-      confettiBurst(x/(window.devicePixelRatio||1), y/(window.devicePixelRatio||1), 16);
-    }
-    function draw(){
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      // twinkles
-      for(let i=0;i<40;i++){
-        const x=(Math.sin((Date.now()/1000)+(i*7))*0.5+0.5)*canvas.width, y=(i/40)*canvas.height;
-        ctx.fillStyle='rgba(255,255,255,0.08)'; ctx.fillRect(x,y,2,2);
-      }
-      for(let i=parts.length-1;i>=0;i--){
-        const p=parts[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.02; p.life-=1;
-        const o=Math.max(0,p.life/80); ctx.beginPath(); ctx.globalAlpha=o; ctx.fillStyle=p.color; ctx.arc(p.x,p.y,2.2,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
-        if(p.life<=0) parts.splice(i,1);
-      }
-      requestAnimationFrame(draw);
-    }
-    draw();
-    function toCanvasCoords(clientX, clientY){
-      const r=canvas.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
-      return { x:(clientX - r.left)*dpr, y:(clientY - r.top)*dpr };
-    }
-    // Tap/click anywhere in the final area to create fireworks
-    const tapOverlay = document.getElementById('tapOverlay');
-    tapOverlay.addEventListener('pointerdown', (e)=>{
-      const p = toCanvasCoords(e.clientX, e.clientY);
-      launch(p.x, p.y, randColor());
-    }, {passive:true});
-    // Also support direct clicks on the canvas
-    canvas.addEventListener('pointerdown', (e)=> {
-      const p = toCanvasCoords(e.clientX, e.clientY);
-      launch(p.x, p.y, randColor());
-    }, {passive:true});
-    document.getElementById('fwRandom').addEventListener('click', ()=>{
-      const x=Math.random()*canvas.width, y=Math.random()*canvas.height*0.6+canvas.height*0.1; launch(x,y,randColor());
+        <div style="font-size:13px;color:#444;text-align:center;margin-top:6px">Candles will animate out and a final song will play.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer><div class="small-muted">Made with 🎉 — Mobile-first</div></footer>
+</div>
+
+<script>
+/* ===========================
+   Utility: small helpers
+   =========================== */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+function ease(t){return (--t)*t*t+1}
+
+/* Confetti canvas */
+const confettiCanvas = $('#confetti-canvas');
+confettiCanvas.width = innerWidth;
+confettiCanvas.height = innerHeight;
+const confCtx = confettiCanvas.getContext('2d');
+let confettiPieces = [];
+function spawnConfetti(x=innerWidth/2,y=innerHeight/2,amount=30){
+  for(let i=0;i<amount;i++){
+    confettiPieces.push({
+      x, y,
+      vx: (Math.random()-0.5)*6,
+      vy: Math.random()*-6 - 1,
+      r: Math.random()*6+4,
+      c: ['#ff5aa5','#6ec6ff','#ffd166','#a17bff'][Math.floor(Math.random()*4)],
+      life: 80 + Math.random()*40
     });
-    // Periodic random fireworks while on final page
-    setInterval(()=>{ if(state.page!=='final') return; const x=Math.random()*canvas.width, y=Math.random()*canvas.height*0.5+canvas.height*0.1; launch(x,y,randColor()); }, 1800);
+  }
+}
+function confettiLoop(){
+  confCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+  confettiPieces.forEach((p,i)=>{
+    p.vy += 0.25;
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life--;
+    confCtx.fillStyle = p.c;
+    confCtx.beginPath();
+    confCtx.ellipse(p.x,p.y,p.r, p.r*0.6, 0,0,Math.PI*2);
+    confCtx.fill();
+    if(p.life<=0 || p.y>confettiCanvas.height+50) confettiPieces.splice(i,1);
+  });
+  requestAnimationFrame(confettiLoop);
+}
+confettiLoop();
 
-    // FINAL: Cake interactions (fixed and tested)
-    const cake = document.getElementById('cake'); const flames = Array.from(cake.querySelectorAll('.flame')); const smoke = cake.querySelector('#smoke');
-    const blowBtn = document.getElementById('blow'); const relightBtn = document.getElementById('relight');
-    let blown=false, flicker=null, blowing=null;
-    function setFlames(v){ flames.forEach(f=> f.style.opacity = v?'1':'0'); }
-    function startFlicker(){ stopFlicker(); flicker=setInterval(()=>{ flames.forEach(f=>{ f.style.transform=`translateY(${(Math.random()*2-1)}px) scale(${0.95+Math.random()*0.1})`; f.style.opacity=String(0.8+Math.random()*0.2); }); }, 100); }
-    function stopFlicker(){ if(flicker){ clearInterval(flicker); flicker=null; } flames.forEach(f=>{ f.style.transform=''; f.style.opacity='1'; }); }
-    function stepBlow(){
-      let op=parseFloat(flames[0].style.opacity||'1'); op-=0.08; flames.forEach(f=> f.style.opacity=String(Math.max(0,op)));
-      if(op<=0.05){ clearInterval(blowing); blowing=null; blown=true; setFlames(false); smoke.style.opacity='1'; setTimeout(()=> smoke.style.opacity='0', 2200); addScore(5); }
+/* Floating balloon background generator */
+const balloonLayer = $('#balloon-layer');
+function makeFloatingBalloon(color, leftPct, delay){
+  const el = document.createElement('div');
+  el.className='balloon';
+  el.style.background = `linear-gradient(180deg, ${color}, ${shade(color,-12)})`;
+  el.style.position='absolute';
+  el.style.left = leftPct + '%';
+  el.style.bottom = '-160px';
+  el.style.transform = `translateY(0)`;
+  el.style.pointerEvents='none';
+  el.style.opacity=0.95;
+  balloonLayer.appendChild(el);
+  // animate up with random sway
+  const dur = 14000 + Math.random()*10000;
+  el.animate([
+    {transform:'translateY(0) translateX(0) rotate(0deg)'},
+    {transform:`translateY(-120vh) translateX(${(Math.random()*80-40)}px) rotate(${(Math.random()*30-15)}deg)`}
+  ],{duration:dur, delay, iterations:1, easing:'cubic-bezier(.2,.8,.2,1)'});
+  setTimeout(()=>el.remove(), dur+delay+200);
+}
+function shade(hex, percent){
+  // expects #rrggbb
+  const n=parseInt(hex.slice(1),16), r=(n>>16), g=(n>>8&255), b=(n&255);
+  const t=percent<0?0:255; const p=Math.abs(percent)/100;
+  const R=Math.round((t-r)*p)+r,G=Math.round((t-g)*p)+g,B=Math.round((t-b)*p)+b;
+  return '#'+(1<<24|R<<16|G<<8|B).toString(16).slice(1);
+}
+// spawn random background balloons occasionally
+setInterval(()=> {
+  makeFloatingBalloon(['#ff5aa5','#6ec6ff','#ffd166','#a17bff'][Math.floor(Math.random()*4)], Math.random()*100, 0);
+}, 2500);
+
+/* Click for confetti burst on body taps */
+document.body.addEventListener('click', (e)=>{
+  spawnConfetti(e.clientX, e.clientY, 18);
+});
+
+/* ===========================
+   SPA Navigation
+   =========================== */
+const pages = {home:$('#home'), voice:$('#voice'), games:$('#games'), final:$('#final')};
+function showPage(name){
+  Object.keys(pages).forEach(k=>pages[k].classList.remove('active'));
+  pages[name].classList.add('active');
+}
+$('#home-btn').onclick = ()=>showPage('home');
+$('#voice-btn').onclick = ()=>showPage('voice');
+$('#games-btn').onclick = ()=>showPage('games');
+$('#final-btn').onclick = ()=>showPage('final');
+
+/* ===========================
+   Name input & global usage
+   =========================== */
+let nameKey = 'birthday_name_v1';
+function setName(n){
+  n = (n || '').trim() || 'Friend';
+  localStorage.setItem(nameKey, n);
+  updateNameUI();
+}
+function getName(){ return localStorage.getItem(nameKey) || 'Friend' }
+function updateNameUI(){
+  const n = getName();
+  $('.greeting').textContent = `Happy Birthday — ${n}!`;
+  $('#homeTitle').textContent = `Happy Birthday — ${n}!`;
+  $('#finalTitle').textContent = `Final Surprise for ${n}`;
+}
+$('#saveNameBtn').onclick = ()=>{ setName($('#nameInput').value); spawnConfetti(innerWidth/2, innerHeight/2, 30); }
+$('#nameInput').addEventListener('keyup', (e)=>{ if(e.key==='Enter') setName(e.target.value); });
+setName(localStorage.getItem(nameKey) || 'Friend');
+
+/* ===========================
+   Simple background melody
+   (WebAudio, small sequence)
+   =========================== */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playMelody(){
+  const now = audioCtx.currentTime;
+  const notes = [523.25,659.25,783.99,659.25]; // C5,E5,G5,E5
+  let t = 0;
+  notes.forEach((f, i) => {
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'sine';
+    o.frequency.value = f;
+    g.gain.value = 0.0001;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(now+t);
+    g.gain.exponentialRampToValueAtTime(0.12, now+t+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, now+t+0.35);
+    o.stop(now+t+0.4);
+    t += 0.35;
+  });
+}
+
+/* play a loop when user taps Surprise */
+$('#surpriseBtn').onclick = async ()=>{
+  showPage('voice');
+  spawnConfetti(innerWidth/2, innerHeight/2, 50);
+  playMelody();
+  // also animate mascot
+  const m = $('#homeMascot');
+  m.animate([{transform:'scale(1)'},{transform:'scale(1.16)'},{transform:'scale(1)'}],{duration:900, iterations:1, easing:'ease-in-out'});
+};
+
+/* ===========================
+   Voice Wishes page
+   - default TTS
+   - upload audio play
+   - mascot animation while speaking
+   =========================== */
+const voiceMascot = $('#voiceMascot');
+const voiceStatus = $('#wave');
+
+function speakText(text, opts={}){
+  if(!('speechSynthesis' in window)) return alert('SpeechSynthesis not supported on this browser.');
+  const ut = new SpeechSynthesisUtterance(text);
+  ut.rate = opts.rate || 1;
+  ut.pitch = opts.pitch || 1.1;
+  ut.lang = opts.lang || 'en-US';
+  ut.onstart = ()=>{voiceStatus.textContent='Status: speaking'; animateMascot(true);}
+  ut.onend = ()=>{voiceStatus.textContent='Status: idle'; animateMascot(false)}
+  speechSynthesis.cancel();
+  speechSynthesis.speak(ut);
+}
+
+function animateMascot(speaking){
+  if(speaking){
+    voiceMascot.animate([{transform:'translateY(0)'},{transform:'translateY(-6px)'},{transform:'translateY(0)'}],{duration:400,iterations:Infinity,easing:'ease-in-out'});
+  } else {
+    voiceMascot.getAnimations().forEach(a=>a.cancel());
+  }
+}
+
+$('#playDefault').onclick = ()=>{
+  const n = getName();
+  speakText(`Happy Birthday ${n}! Wishing you a fantastic day full of cake and smiles!`, {rate:1,pitch:1.2});
+};
+
+/* File upload play */
+const uploadedAudio = $('#uploadedAudio');
+$('#uploadAudio').addEventListener('change', async (e)=>{
+  const f = e.target.files[0];
+  if(!f) return;
+  const url = URL.createObjectURL(f);
+  uploadedAudio.src = url;
+  uploadedAudio.style.display='block';
+  uploadedAudio.play();
+  animateMascot(true);
+  uploadedAudio.onended = ()=> animateMascot(false);
+});
+
+/* ===========================
+   Balloon Pop Game
+   =========================== */
+const balloonGame = $('#balloonGame');
+const balloonMessages = [
+  "Have a blast!",
+  "Cake time 🎂",
+  "Make a wish!",
+  "Party on!",
+  "Hugs 🤗",
+  "Surprise!"
+];
+function spawnGameBalloon(){
+  const el = document.createElement('div');
+  el.className='balloon';
+  el.style.left = (10 + Math.random()*80) + '%';
+  el.style.bottom = '-90px';
+  el.style.background = ['#ff5aa5','#6ec6ff','#ffd166','#a17bff'][Math.floor(Math.random()*4)];
+  el.style.position='absolute';
+  el.style.width = `${56 + Math.random()*30}px`;
+  el.style.height = `${76 + Math.random()*30}px`;
+  el.style.fontSize = '15px';
+  el.textContent = '🎈';
+  balloonGame.appendChild(el);
+  // float up
+  const dur = 6000 + Math.random()*5000;
+  const anim = el.animate([{transform:'translateY(0)'},{transform:`translateY(-320px)`}],{duration:dur, easing:'linear'});
+  // attach click to pop
+  el.addEventListener('click', (ev)=>{
+    ev.stopPropagation();
+    const idx = Math.floor(Math.random()*balloonMessages.length);
+    const msg = balloonMessages[idx];
+    popEffect(el);
+    showTempMessage(msg);
+    spawnConfetti(ev.clientX, ev.clientY, 14);
+  });
+  setTimeout(()=>{ if(el.parentNode) el.remove();}, dur+2000);
+}
+function popEffect(el){
+  el.style.transition='transform .2s ease, opacity .2s ease';
+  el.style.transform='scale(0.2) rotate(20deg)';
+  el.style.opacity='0';
+  setTimeout(()=>el.remove(),220);
+}
+function showTempMessage(text){
+  const d = document.createElement('div');
+  d.className='msg'; d.textContent=text;
+  d.style.position='absolute'; d.style.bottom='10px'; d.style.left='50%';
+  d.style.transform='translateX(-50%)'; d.style.zIndex=10;
+  balloonGame.appendChild(d);
+  setTimeout(()=>d.remove(),2200);
+}
+// spawn continuous for game area
+let balloonGameInterval = setInterval(spawnGameBalloon, 900);
+
+/* ===========================
+   Gift boxes logic
+   =========================== */
+const gifts = $$('.gift');
+const giftReveal = $('#giftReveal');
+const giftContents = [
+  "Joke: Why did the candle get fired? It couldn't hold a flame!",
+  "Look behind you — a virtual hug! 🤗",
+  "Here's a secret: you are amazing!"
+];
+gifts.forEach(g=>{
+  g.addEventListener('click', (e)=>{
+    const idx = parseInt(g.dataset.idx,10) || 0;
+    giftReveal.textContent = giftContents[idx % giftContents.length];
+    spawnConfetti(e.clientX, e.clientY, 16);
+    g.animate([{transform:'translateY(0)'},{transform:'translateY(-6px)'},{transform:'translateY(0)'}],{duration:500,iterations:1});
+  });
+});
+
+/* ===========================
+   Memory Match Game
+   =========================== */
+const icons = ['🎂','🎉','🎈','🕯️','🎁','🥳','🍰','🎵'];
+let memoryState = {first:null, second:null, pairsFound:0};
+function initMemory(){
+  const grid = $('#memoryGrid');
+  grid.innerHTML='';
+  const pairs = icons.slice(0,6); // choose 6 pairs for 12 cards
+  const deck = shuffle([...pairs, ...pairs]);
+  deck.forEach((icon, idx)=>{
+    const card = document.createElement('div');
+    card.className='card';
+    card.dataset.icon = icon;
+    card.dataset.idx = idx;
+    card.textContent = '';
+    card.addEventListener('click', ()=>flipCard(card));
+    grid.appendChild(card);
+  });
+}
+function flipCard(card){
+  if(card.classList.contains('flipped') || memoryState.second) return;
+  card.classList.add('flipped');
+  card.textContent = card.dataset.icon;
+  if(!memoryState.first){ memoryState.first = card; return; }
+  memoryState.second = card;
+  // check match
+  if(memoryState.first.dataset.icon === memoryState.second.dataset.icon){
+    memoryState.pairsFound++;
+    spawnConfetti(card.getBoundingClientRect().left + 20, card.getBoundingClientRect().top + 20, 12);
+    memoryState.first.style.pointerEvents='none';
+    memoryState.second.style.pointerEvents='none';
+    memoryState.first = memoryState.second = null;
+    if(memoryState.pairsFound >= 6){
+      setTimeout(()=>{ alert('You found them all! 🎉'); initMemory(); memoryState.pairsFound=0; }, 400);
     }
-    const startBlow = (e)=>{ e.preventDefault(); if(blown) return; startFlicker(); if(!blowing) blowing=setInterval(stepBlow,80); };
-    const endBlow = ()=>{ if(blowing){ clearInterval(blowing); blowing=null; stopFlicker(); } };
-    blowBtn.addEventListener('pointerdown', startBlow); window.addEventListener('pointerup', endBlow);
-    cake.addEventListener('click', ()=>{ if(blown) return; startFlicker(); let steps=12; const tmp=setInterval(()=>{ stepBlow(); if(--steps<=0){ clearInterval(tmp); stopFlicker(); } },60); });
-    relightBtn.addEventListener('click', ()=>{ blown=false; setFlames(true); smoke.style.opacity='0'; startFlicker(); setTimeout(stopFlicker,600); });
+  } else {
+    setTimeout(()=>{ memoryState.first.classList.remove('flipped'); memoryState.first.textContent=''; memoryState.second.classList.remove('flipped'); memoryState.second.textContent=''; memoryState.first=null; memoryState.second=null; }, 800);
+  }
+}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]] } return a; }
+initMemory();
 
-    // Final song (Demo)
-    document.getElementById('songDemo').addEventListener('click', ()=> showToast('Playing final song (Demo)'));
+/* ===========================
+   Messages save/load
+   =========================== */
+const messagesKey = 'birthday_messages_v1';
+function saveMessage(text){
+  if(!text.trim()) return;
+  const arr = JSON.parse(localStorage.getItem(messagesKey) || '[]');
+  arr.unshift({text, time:Date.now()});
+  localStorage.setItem(messagesKey, JSON.stringify(arr));
+  renderMessages();
+  spawnConfetti(innerWidth/2, innerHeight/2, 22);
+}
+function renderMessages(){
+  const arr = JSON.parse(localStorage.getItem(messagesKey) || '[]');
+  const el = $('#messagesList'); el.innerHTML='';
+  arr.forEach(m=>{
+    const d = document.createElement('div'); d.className='msg';
+    const t = new Date(m.time).toLocaleString();
+    d.innerHTML = `<div style="font-weight:700">${m.text}</div><div style="font-size:12px;color:#555">${t}</div>`;
+    el.appendChild(d);
+  });
+}
+$('#saveMsg').onclick = ()=>{ saveMessage($('#msgInput').value); $('#msgInput').value=''; }
+$('#clearMsgs').onclick = ()=>{ localStorage.removeItem(messagesKey); renderMessages(); }
+renderMessages();
 
-    // Swipe navigation (mobile)
-    let sx=null; window.addEventListener('touchstart', e=>{ sx=e.changedTouches[0].clientX; }, {passive:true});
-    window.addEventListener('touchend', e=>{
-      const dx=e.changedTouches[0].clientX - (sx ?? e.changedTouches[0].clientX);
-      const order=['home','voice','games','final']; const i=order.indexOf(state.page);
-      if(Math.abs(dx)>60){ if(dx<0 && i<order.length-1) showPage(order[i+1]); if(dx>0 && i>0) showPage(order[i-1]); }
-    }, {passive:true});
+/* ===========================
+   Final Cake: blow out click & mic detection
+   =========================== */
+const cake = $('#cake');
+const candles = $('#candles');
+const blowBtn = $('#blowBtn');
+const micBlowBtn = $('#micBlowBtn');
 
-    // Activate initial states
-    Object.values(pages).forEach(p=>{ if(!p.classList.contains('shown')) p.classList.add('hidden'); });
-  </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ef3bc9228598d6',t:'MTc1Nzg0NjA4NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+function blowOut(){
+  cake.classList.add('blown');
+  spawnConfetti(innerWidth/2, innerHeight/2, 80);
+  playFinalSong();
+  setTimeout(()=> cake.classList.remove('blown'), 5000);
+}
+blowBtn.onclick = ()=> blowOut();
+
+/* Mic blow detection: measure microphone volume */
+let mediaStream, analyser, dataArray, listening=false;
+async function startMicDetect(){
+  if(listening) return;
+  try{
+    mediaStream = await navigator.mediaDevices.getUserMedia({audio:true});
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const source = ctx.createMediaStreamSource(mediaStream);
+    analyser = ctx.createAnalyser(); analyser.fftSize = 256;
+    source.connect(analyser);
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+    listening = true;
+    micBlowBtn.textContent = 'Listening... Blow!';
+    detectLoudness();
+  }catch(e){ alert('Microphone access denied or not available.'); console.warn(e) }
+}
+function stopMicDetect(){ if(mediaStream){ mediaStream.getTracks().forEach(t=>t.stop()); mediaStream=null } listening=false; micBlowBtn.textContent='Blow into Mic'; }
+function detectLoudness(){
+  if(!listening || !analyser) return;
+  analyser.getByteTimeDomainData(dataArray);
+  // compute amplitude
+  let sum=0; for(let i=0;i<dataArray.length;i++){ const v=(dataArray[i]-128)/128; sum += v*v; }
+  const rms = Math.sqrt(sum/dataArray.length);
+  // console.log(rms);
+  // threshold tuned for mobile mouth-blow (~0.09)
+  if(rms > 0.11){
+    // success: blow detected
+    stopMicDetect();
+    blowOut();
+  } else {
+    requestAnimationFrame(detectLoudness);
+  }
+}
+micBlowBtn.addEventListener('click', ()=>{
+  if(!listening) startMicDetect(); else stopMicDetect();
+});
+
+/* Final song: speak + melody */
+function playFinalSong(){
+  const n = getName();
+  speakText(`Make a wish ${n}! Happy Birthday!`, {rate:0.95, pitch:1.2});
+  // play short melody after small delay
+  setTimeout(()=>{ playMelody(); setTimeout(()=> playMelody(), 450); }, 900);
+}
+
+/* ===========================
+   Small decorations & start-up
+   =========================== */
+updateNameUI();
+window.addEventListener('resize', ()=>{ confettiCanvas.width = innerWidth; confettiCanvas.height = innerHeight; });
+
+/* small utility: prevent autoplay issues by resuming audio context on first interaction */
+function resumeAudioContext(){
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  document.removeEventListener('touchstart', resumeAudioContext);
+}
+document.addEventListener('touchstart', resumeAudioContext);
+
+/* Helpful small seed confetti on load */
+window.addEventListener('load', ()=>{ spawnConfetti(innerWidth/2, innerHeight/3, 26); });
+
+/* Accessibility: keyboard nav for testing on desktop */
+document.addEventListener('keydown', (e)=>{
+  if(e.key === '1') showPage('home');
+  if(e.key === '2') showPage('voice');
+  if(e.key === '3') showPage('games');
+  if(e.key === '4') showPage('final');
+});
+
+</script>
+</body>
 </html>
